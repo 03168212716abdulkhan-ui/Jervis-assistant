@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>JARVIS Assistant</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -22,8 +24,8 @@ body{
 }
 
 .jarvis{
-  width:90%;
-  max-width:450px;
+  width:92%;
+  max-width:480px;
   text-align:center;
   padding:30px 20px;
   border-radius:25px;
@@ -49,12 +51,12 @@ h1{
 
 button{
   border:0;
-  padding:15px 25px;
+  padding:14px 22px;
   margin:5px;
   border-radius:30px;
   background:#008cff;
   color:white;
-  font-size:17px;
+  font-size:16px;
   font-weight:bold;
   cursor:pointer;
 }
@@ -62,6 +64,34 @@ button{
 button:active{
   transform:scale(.95);
 }
+
+#chatBox{
+  margin-top:20px;
+  display:flex;
+  gap:6px;
+}
+
+#chatInput{
+  flex:1;
+  min-width:0;
+  padding:14px;
+  border:0;
+  border-radius:25px;
+  outline:none;
+  font-size:16px;
+  background:#102f49;
+  color:white;
+}
+
+#chatInput::placeholder{
+  color:#9bb8ca;
+}
+
+#chatBox button{
+  margin:0;
+  padding:12px 16px;
+}
+
 </style>
 </head>
 
@@ -72,13 +102,28 @@ button:active{
 <h1>🤖 JARVIS</h1>
 
 <div id="s">
-Ready. Tap Speak.
+Ready. Speak or type a message.
 </div>
 
 <button onclick="talk()">🎙️ Speak</button>
+
 <button onclick="stopJarvis()">⏹️ Stop</button>
 
+
+<div id="chatBox">
+
+<input
+id="chatInput"
+type="text"
+placeholder="Type your message..."
+>
+
+<button onclick="sendChat()">💬 Chat</button>
+
 </div>
+
+</div>
+
 
 <script>
 
@@ -87,7 +132,7 @@ const s = document.getElementById("s");
 let recognition = null;
 
 
-/* JARVIS VOICE */
+/* VOICE REPLY */
 
 function speak(text){
 
@@ -109,7 +154,7 @@ function speak(text){
 }
 
 
-/* MICROPHONE */
+/* VOICE INPUT */
 
 function talk(){
 
@@ -125,6 +170,7 @@ function talk(){
     return;
   }
 
+
   if(recognition){
 
     try{
@@ -133,12 +179,17 @@ function talk(){
 
   }
 
+
   recognition = new SR();
 
   recognition.lang = "en-US";
+
   recognition.interimResults = false;
+
   recognition.continuous = false;
+
   recognition.maxAlternatives = 1;
+
 
   s.textContent =
     "🎙️ Listening... Speak now.";
@@ -151,10 +202,13 @@ function talk(){
       .toLowerCase()
       .trim();
 
+
     s.textContent =
-      "You said: " + text;
+      "You: " + text;
+
 
     jarvisCommand(text);
+
   };
 
 
@@ -163,21 +217,14 @@ function talk(){
     if(event.error === "not-allowed"){
 
       s.textContent =
-        "🎙️ Microphone permission is blocked. Allow microphone in Chrome.";
+        "🎙️ Microphone permission is blocked.";
 
     }
 
     else if(event.error === "no-speech"){
 
       s.textContent =
-        "🎙️ No speech detected. Tap Speak and try again.";
-
-    }
-
-    else if(event.error === "aborted"){
-
-      s.textContent =
-        "🎙️ Microphone stopped. Tap Speak again.";
+        "🎙️ No speech detected. Try again.";
 
     }
 
@@ -187,12 +234,6 @@ function talk(){
         "Microphone error: " + event.error;
 
     }
-  };
-
-
-  recognition.onend = function(){
-
-    console.log("Microphone ended");
 
   };
 
@@ -207,15 +248,14 @@ function talk(){
       "🎙️ Tap Speak again.";
 
   }
+
 }
 
 
-/* COMMANDS */
+/* JARVIS COMMANDS */
 
 function jarvisCommand(text){
 
-
-  /* HELLO */
 
   if(
     text.includes("hello") ||
@@ -229,8 +269,6 @@ function jarvisCommand(text){
 
   }
 
-
-  /* TIME */
 
   else if(text.includes("time")){
 
@@ -250,21 +288,15 @@ function jarvisCommand(text){
   }
 
 
-  /* DATE */
-
   else if(text.includes("date")){
 
-    const date =
-      new Date().toLocaleDateString();
-
     speak(
-      "Today's date is " + date
+      "Today's date is " +
+      new Date().toLocaleDateString()
     );
 
   }
 
-
-  /* YOUTUBE */
 
   else if(text.includes("youtube")){
 
@@ -280,8 +312,6 @@ function jarvisCommand(text){
   }
 
 
-  /* GOOGLE */
-
   else if(text.includes("google")){
 
     speak("Opening Google.");
@@ -296,18 +326,18 @@ function jarvisCommand(text){
   }
 
 
-  /* SEARCH */
-
   else if(text.startsWith("search")){
 
     const query =
       text.replace("search","").trim();
+
 
     if(query){
 
       speak(
         "Searching for " + query
       );
+
 
       setTimeout(function(){
 
@@ -326,10 +356,9 @@ function jarvisCommand(text){
       );
 
     }
+
   }
 
-
-  /* WHO ARE YOU */
 
   else if(
     text.includes("who are you") ||
@@ -343,26 +372,12 @@ function jarvisCommand(text){
   }
 
 
-  /* STOP */
-
-  else if(
-    text.includes("stop") ||
-    text.includes("shut up")
-  ){
-
-    stopJarvis();
-
-  }
-
-
-  /* UNKNOWN */
-
   else{
 
     speak(
       "I heard " +
       text +
-      ". I do not know that command yet."
+      ". You can ask me for the time, date, Google or YouTube."
     );
 
   }
@@ -370,7 +385,49 @@ function jarvisCommand(text){
 }
 
 
-/* STOP BUTTON */
+/* CHAT BUTTON */
+
+function sendChat(){
+
+  const input =
+    document.getElementById("chatInput");
+
+  const text =
+    input.value.toLowerCase().trim();
+
+
+  if(!text){
+
+    speak("Please type something.");
+
+    return;
+  }
+
+
+  input.value = "";
+
+
+  jarvisCommand(text);
+
+}
+
+
+/* ENTER KEY */
+
+document
+  .getElementById("chatInput")
+  .addEventListener("keydown",function(event){
+
+    if(event.key === "Enter"){
+
+      sendChat();
+
+    }
+
+  });
+
+
+/* STOP */
 
 function stopJarvis(){
 
@@ -382,11 +439,13 @@ function stopJarvis(){
 
   }
 
+
   if("speechSynthesis" in window){
 
     speechSynthesis.cancel();
 
   }
+
 
   s.textContent =
     "⏹️ Jarvis stopped.";
