@@ -1,91 +1,399 @@
-<script>  
-function talk(){  
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;  
-  
-  if(!SR){  
-    s.textContent = "Voice recognition is not supported. Use Chrome.";  
-    return;  
-  }  
-  
-  const r = new SR();  
-  
-  r.lang = "en-US";  
-  r.interimResults = false;  
-  r.continuous = false;  
-  r.maxAlternatives = 1;  
-  
-  s.textContent = "🎙️ Listening... Speak now.";  
-  
-  r.onresult = function(e){  
-    const text = e.results[0][0].transcript.toLowerCase();  
-    s.textContent = "You said: " + text;  
-  };  
-  
-  r.onerror = function(e){  
-    if(e.error === "aborted"){  
-      s.textContent = "🎙️ Microphone stopped. Tap again and speak.";  
-    } else if(e.error === "not-allowed"){  
-      s.textContent = "🎙️ Microphone permission is blocked.";  
-    } else if(e.error === "no-speech"){  
-      s.textContent = "🎙️ No speech detected. Try again.";  
-    } else {  
-      s.textContent = "Microphone error: " + e.error;  
-    }  
-  };  
-  
-  r.onend = function(){  
-    console.log("Microphone ended");  
-  };  
-  
-  try{  
-    r.start();  
-  }catch(error){  
-    s.textContent = "🎙️ Microphone could not start. Try again.";  
-  }  
-}  
-</script><script>  
-function talk(){  
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;  
-  
-  if(!SR){  
-    s.textContent = "Voice recognition is not supported. Use Chrome.";  
-    return;  
-  }  
-  
-  const r = new SR();  
-  
-  r.lang = "en-US";  
-  r.interimResults = false;  
-  r.continuous = false;  
-  r.maxAlternatives = 1;  
-  
-  s.textContent = "🎙️ Listening... Speak now.";  
-  
-  r.onresult = function(e){  
-    const text = e.results[0][0].transcript.toLowerCase();  
-    s.textContent = "You said: " + text;  
-  };  
-  
-  r.onerror = function(e){  
-    if(e.error === "aborted"){  
-      s.textContent = "🎙️ Microphone stopped. Tap again and speak.";  
-    } else if(e.error === "not-allowed"){  
-      s.textContent = "🎙️ Microphone permission is blocked.";  
-    } else if(e.error === "no-speech"){  
-      s.textContent = "🎙️ No speech detected. Try again.";  
-    } else {  
-      s.textContent = "Microphone error: " + e.error;  
-    }  
-  };  
-  
-  r.onend = function(){  
-    console.log("Microphone ended");  
-  };  
-  
-  try{  
-    r.start();  
-  }catch(error){  
-    s.textContent = "🎙️ Microphone could not start. Try again.";  
-  }  
-}  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS Assistant</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#020914;
+  color:white;
+  font-family:Arial,sans-serif;
+}
+
+.jarvis{
+  width:90%;
+  max-width:450px;
+  text-align:center;
+  padding:30px 20px;
+  border-radius:25px;
+  background:#071a2d;
+  box-shadow:0 0 30px #008cff;
+}
+
+h1{
+  color:#00aaff;
+  font-size:42px;
+  margin-top:0;
+}
+
+#s{
+  min-height:55px;
+  margin:20px 0;
+  padding:15px;
+  border-radius:15px;
+  background:#0b263d;
+  color:#8ed8ff;
+  line-height:1.5;
+}
+
+button{
+  border:0;
+  padding:15px 25px;
+  margin:5px;
+  border-radius:30px;
+  background:#008cff;
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:active{
+  transform:scale(.95);
+}
+</style>
+</head>
+
+<body>
+
+<div class="jarvis">
+
+<h1>🤖 JARVIS</h1>
+
+<div id="s">
+Ready. Tap Speak.
+</div>
+
+<button onclick="talk()">🎙️ Speak</button>
+<button onclick="stopJarvis()">⏹️ Stop</button>
+
+</div>
+
+<script>
+
+const s = document.getElementById("s");
+
+let recognition = null;
+
+
+/* JARVIS VOICE */
+
+function speak(text){
+
+  s.textContent = text;
+
+  if("speechSynthesis" in window){
+
+    speechSynthesis.cancel();
+
+    const voice =
+      new SpeechSynthesisUtterance(text);
+
+    voice.lang = "en-US";
+    voice.rate = 1;
+    voice.pitch = 1;
+
+    speechSynthesis.speak(voice);
+  }
+}
+
+
+/* MICROPHONE */
+
+function talk(){
+
+  const SR =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!SR){
+
+    s.textContent =
+      "Voice recognition is not supported. Please use Chrome.";
+
+    return;
+  }
+
+  if(recognition){
+
+    try{
+      recognition.stop();
+    }catch(e){}
+
+  }
+
+  recognition = new SR();
+
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.continuous = false;
+  recognition.maxAlternatives = 1;
+
+  s.textContent =
+    "🎙️ Listening... Speak now.";
+
+
+  recognition.onresult = function(event){
+
+    const text =
+      event.results[0][0].transcript
+      .toLowerCase()
+      .trim();
+
+    s.textContent =
+      "You said: " + text;
+
+    jarvisCommand(text);
+  };
+
+
+  recognition.onerror = function(event){
+
+    if(event.error === "not-allowed"){
+
+      s.textContent =
+        "🎙️ Microphone permission is blocked. Allow microphone in Chrome.";
+
+    }
+
+    else if(event.error === "no-speech"){
+
+      s.textContent =
+        "🎙️ No speech detected. Tap Speak and try again.";
+
+    }
+
+    else if(event.error === "aborted"){
+
+      s.textContent =
+        "🎙️ Microphone stopped. Tap Speak again.";
+
+    }
+
+    else{
+
+      s.textContent =
+        "Microphone error: " + event.error;
+
+    }
+  };
+
+
+  recognition.onend = function(){
+
+    console.log("Microphone ended");
+
+  };
+
+
+  try{
+
+    recognition.start();
+
+  }catch(error){
+
+    s.textContent =
+      "🎙️ Tap Speak again.";
+
+  }
+}
+
+
+/* COMMANDS */
+
+function jarvisCommand(text){
+
+
+  /* HELLO */
+
+  if(
+    text.includes("hello") ||
+    text.includes("hi") ||
+    text.includes("hey")
+  ){
+
+    speak(
+      "Hello. I am Jarvis. How can I help you?"
+    );
+
+  }
+
+
+  /* TIME */
+
+  else if(text.includes("time")){
+
+    const time =
+      new Date().toLocaleTimeString(
+        [],
+        {
+          hour:"2-digit",
+          minute:"2-digit"
+        }
+      );
+
+    speak(
+      "The time is " + time
+    );
+
+  }
+
+
+  /* DATE */
+
+  else if(text.includes("date")){
+
+    const date =
+      new Date().toLocaleDateString();
+
+    speak(
+      "Today's date is " + date
+    );
+
+  }
+
+
+  /* YOUTUBE */
+
+  else if(text.includes("youtube")){
+
+    speak("Opening YouTube.");
+
+    setTimeout(function(){
+
+      window.location.href =
+        "https://www.youtube.com/";
+
+    },1000);
+
+  }
+
+
+  /* GOOGLE */
+
+  else if(text.includes("google")){
+
+    speak("Opening Google.");
+
+    setTimeout(function(){
+
+      window.location.href =
+        "https://www.google.com/";
+
+    },1000);
+
+  }
+
+
+  /* SEARCH */
+
+  else if(text.startsWith("search")){
+
+    const query =
+      text.replace("search","").trim();
+
+    if(query){
+
+      speak(
+        "Searching for " + query
+      );
+
+      setTimeout(function(){
+
+        window.location.href =
+          "https://www.google.com/search?q=" +
+          encodeURIComponent(query);
+
+      },1000);
+
+    }
+
+    else{
+
+      speak(
+        "What should I search for?"
+      );
+
+    }
+  }
+
+
+  /* WHO ARE YOU */
+
+  else if(
+    text.includes("who are you") ||
+    text.includes("your name")
+  ){
+
+    speak(
+      "My name is Jarvis. I am your voice assistant."
+    );
+
+  }
+
+
+  /* STOP */
+
+  else if(
+    text.includes("stop") ||
+    text.includes("shut up")
+  ){
+
+    stopJarvis();
+
+  }
+
+
+  /* UNKNOWN */
+
+  else{
+
+    speak(
+      "I heard " +
+      text +
+      ". I do not know that command yet."
+    );
+
+  }
+
+}
+
+
+/* STOP BUTTON */
+
+function stopJarvis(){
+
+  if(recognition){
+
+    try{
+      recognition.stop();
+    }catch(e){}
+
+  }
+
+  if("speechSynthesis" in window){
+
+    speechSynthesis.cancel();
+
+  }
+
+  s.textContent =
+    "⏹️ Jarvis stopped.";
+
+}
+
 </script>
+
+</body>
+</html>
