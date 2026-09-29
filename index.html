@@ -1,0 +1,91 @@
+<script>  
+function talk(){  
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;  
+  
+  if(!SR){  
+    s.textContent = "Voice recognition is not supported. Use Chrome.";  
+    return;  
+  }  
+  
+  const r = new SR();  
+  
+  r.lang = "en-US";  
+  r.interimResults = false;  
+  r.continuous = false;  
+  r.maxAlternatives = 1;  
+  
+  s.textContent = "🎙️ Listening... Speak now.";  
+  
+  r.onresult = function(e){  
+    const text = e.results[0][0].transcript.toLowerCase();  
+    s.textContent = "You said: " + text;  
+  };  
+  
+  r.onerror = function(e){  
+    if(e.error === "aborted"){  
+      s.textContent = "🎙️ Microphone stopped. Tap again and speak.";  
+    } else if(e.error === "not-allowed"){  
+      s.textContent = "🎙️ Microphone permission is blocked.";  
+    } else if(e.error === "no-speech"){  
+      s.textContent = "🎙️ No speech detected. Try again.";  
+    } else {  
+      s.textContent = "Microphone error: " + e.error;  
+    }  
+  };  
+  
+  r.onend = function(){  
+    console.log("Microphone ended");  
+  };  
+  
+  try{  
+    r.start();  
+  }catch(error){  
+    s.textContent = "🎙️ Microphone could not start. Try again.";  
+  }  
+}  
+</script><script>  
+function talk(){  
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;  
+  
+  if(!SR){  
+    s.textContent = "Voice recognition is not supported. Use Chrome.";  
+    return;  
+  }  
+  
+  const r = new SR();  
+  
+  r.lang = "en-US";  
+  r.interimResults = false;  
+  r.continuous = false;  
+  r.maxAlternatives = 1;  
+  
+  s.textContent = "🎙️ Listening... Speak now.";  
+  
+  r.onresult = function(e){  
+    const text = e.results[0][0].transcript.toLowerCase();  
+    s.textContent = "You said: " + text;  
+  };  
+  
+  r.onerror = function(e){  
+    if(e.error === "aborted"){  
+      s.textContent = "🎙️ Microphone stopped. Tap again and speak.";  
+    } else if(e.error === "not-allowed"){  
+      s.textContent = "🎙️ Microphone permission is blocked.";  
+    } else if(e.error === "no-speech"){  
+      s.textContent = "🎙️ No speech detected. Try again.";  
+    } else {  
+      s.textContent = "Microphone error: " + e.error;  
+    }  
+  };  
+  
+  r.onend = function(){  
+    console.log("Microphone ended");  
+  };  
+  
+  try{  
+    r.start();  
+  }catch(error){  
+    s.textContent = "🎙️ Microphone could not start. Try again.";  
+  }  
+}  
+</script>
